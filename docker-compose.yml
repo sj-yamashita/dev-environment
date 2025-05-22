@@ -1,0 +1,45 @@
+services:
+  dev_db:
+    container_name: dev_db
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: dev_postgres_user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - dev_pgdata:/var/lib/postgresql/data
+    networks:
+      - dev-common-network
+
+  dev_redis:
+    container_name: dev_redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - dev-common-network
+
+  dev_mail:
+    container_name: dev_mail
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./mailpit:/data
+    environment:
+      TZ: Asia/Tokyo
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - dev-common-network
+
+volumes:
+  dev_pgdata:
+
+networks:
+  dev-common-network:
+    driver: bridge
